@@ -1,7 +1,18 @@
 /* eslint-disable no-undef */
-function search(query, cb) {
-  return fetch(`api/food?q=${query}`, {
+
+function ccVerify(cardNum, cvv, cb) {
+  return fetch('api/card', {
     accept: 'application/json',
+    body: JSON.stringify({
+    "cardNumber":cardNum,
+    "cardCvv":cvv
+    }),
+    headers: {
+        'Accept': 'application/json, text/plain, */*',
+        'Content-Type': 'application/json'
+    },
+    method: 'POST',
+    //mode: 'cors'
   }).then(checkStatus)
     .then(parseJSON)
     .then(cb);
@@ -22,5 +33,5 @@ function parseJSON(response) {
   return response.json();
 }
 
-const Client = { search };
+const Client = { ccVerify };
 export default Client;

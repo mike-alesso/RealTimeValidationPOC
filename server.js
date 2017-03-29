@@ -1,6 +1,8 @@
 const express = require('express');
 const fs = require('fs');
 const sqlite = require('sql.js');
+const bodyParser = require('body-parser');
+const host = 'soagw-dmznonprod.ins.dell.com';
 
 const filebuffer = fs.readFileSync('db/usda-nnd.sqlite3');
 
@@ -24,6 +26,97 @@ const COLUMNS = [
   'kcal',
   'description',
 ];
+
+app.use(bodyParser.json());
+
+var getRtv = function (req, res, next) {
+const host = 'REDACTED';
+const endpoint =  '/smartpaymentsapi/v3/Commerce/Payments/CreditCard/Validate';
+const https = require('https');
+const headers = {
+  'Accept': 'application/json',
+  'Content-Type': 'application/json',
+  'SPApiKey': 'REDACTED',
+  'Authorization': 'REDACTED'
+}; 
+
+const method = 'POST';
+
+var body = {
+    clientSessionId: 'E56C61B8-68FF-4C21-8BE8-A2E3F1029EAD',
+    language: 'EN',
+    country: 'US',
+    region: 'US',
+    currency: 'USD',
+    salesChannel: 'US_19',
+    cards: [
+      {
+      'cardNumber': req.body.cardNumber,
+      'cid': req.body.cardCvv,
+      'cardHolderName': 'Michael Dell',
+      'expiryYear': '2020',
+      'expiryMonth': '04',
+      'billingAddress': {
+        'address1': '1 NORTHEASTERN BLVD',
+        'address2': '',
+        'address3': '',
+        'zipCode': '03109-1234',
+        'city': 'BEDFORD',
+        'state': 'NH',
+        'country': 'US',
+        'phoneNumber': '9035171619'
+      },
+    'installments': '1',
+    'cardinalTransactionId': 'Hid1E9FtSo4tN2r3nDD0'
+    }
+  ]
+}
+
+var jsonRequest = JSON.stringify(body);
+
+const options = {
+  host: host,
+  path: endpoint,
+  method: method,
+  headers: headers
+};
+
+var request = https.request(options, function(response) {
+  response.setEncoding('utf-8');
+
+  var responseString = '';
+
+  response.on('data', function(data) {
+    responseString += data;
+  });
+
+  response.on('end', function() {
+    console.log(responseString);
+    req.getRtv = JSON.parse(responseString);
+    next();
+  });
+});
+
+  request.write(jsonRequest);
+  request.end();
+
+  
+};
+
+app.use(getRtv);
+
+app.post('/api/card', (req, res) => {
+  if (!req.body) return res.sendStatus(400)
+  console.log(req.body);
+  var rtvResults = req.getRtv;
+  res.setHeader('Content-Type', 'application/json');
+console.log(rtvResults);
+res.send(JSON.stringify(rtvResults));
+
+})
+
+
+
 app.get('/api/food', (req, res) => {
   const param = req.query.q;
 
