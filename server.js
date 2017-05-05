@@ -2,7 +2,7 @@ const express = require('express');
 const fs = require('fs');
 const sqlite = require('sql.js');
 const bodyParser = require('body-parser');
-const host = 'soagw-dmznonprod.ins.dell.com';
+const host = 'REDACTED';
 
 const filebuffer = fs.readFileSync('db/usda-nnd.sqlite3');
 
@@ -30,30 +30,29 @@ const COLUMNS = [
 app.use(bodyParser.json());
 
 var getRtv = function (req, res, next) {
-const host = 'REDACTED';
+const host = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
 const endpoint =  '/smartpaymentsapi/v3/Commerce/Payments/CreditCard/Validate';
 const https = require('https');
 const headers = {
   'Accept': 'application/json',
   'Content-Type': 'application/json',
-  'SPApiKey': 'REDACTED',
-  'Authorization': 'REDACTED'
+  'SPApiKey': 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+  'Authorization': 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
 }; 
 
 const method = 'POST';
 
 var body = {
-    clientSessionId: 'E56C61B8-68FF-4C21-8BE8-A2E3F1029EAD',
-    language: 'EN',
-    country: 'US',
-    region: 'US',
-    currency: 'USD',
-    salesChannel: 'US_19',
-    cards: [
+    'language': 'EN',
+    'country': 'US',
+    'region': 'US',
+    'currency': 'USD',
+    'salesChannel': 'US_19',
+    'cards': [
       {
       'cardNumber': req.body.cardNumber,
       'cid': req.body.cardCvv,
-      'cardHolderName': 'Michael Dell',
+      'cardHolderName': 'Michael Jones',
       'expiryYear': '2020',
       'expiryMonth': '04',
       'billingAddress': {

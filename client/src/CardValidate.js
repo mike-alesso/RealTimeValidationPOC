@@ -10,9 +10,9 @@ class CardValidate extends React.Component {
     cardNumber: '',
     cardCvv:'',
     cardDescription:'',
-    isCcVerified:false,
-    rtvVerified:false,
-    validationStatus: false,
+    isCcVerified:'',
+    rtvVerified:'',
+    validationStatus: '',
     addressValidationResult:'',
     cvvValidationResult:'',
     isPrepaidCard: false,
@@ -32,10 +32,20 @@ class CardValidate extends React.Component {
         isCcVerified: cardRes[0].isCCVerified,
         rtvVerified: cardRes[0].rtvResponse.rtvVerified,
         validationStatus: cardRes[0].rtvResponse.validationStatus,
+        transactionSummary: cardRes[0].rtvResponse.transactionSummary,
+        transactionId: cardRes[0].rtvResponse.transactionId,
+        bepResponseCode: cardRes[0].rtvResponse.bepResponseCode,
+        bepResponseMessage: cardRes[0].rtvResponse.bepResponse
         });
       } else {
         this.setState({
           isCcVerified: cardRes[0].isCCVerified,
+          rtvVerified: '',
+          validationStatus: '',
+          transactionSummary: '',
+          transactionId: '',
+          bepResponseCode: '',
+          bepResponseMessage: ''
         });
       };
       if(cardRes[0].paymentExceptions){
@@ -43,7 +53,12 @@ class CardValidate extends React.Component {
           paymentExceptionMessage: cardRes[0].paymentExceptions[0].message,
           paymentExceptionCode: cardRes[0].paymentExceptions[0].code
         });
-
+      }
+      else {
+        this.setState({
+          paymentExceptionMessage: '',
+          paymentExceptionCode: ''
+        });
       }
     });
   };
@@ -105,8 +120,8 @@ class CardValidate extends React.Component {
 
     const cardRows = ( 
       <tr>
-        <td>Card Result</td>
-        <td className='right aligned'>{this.state.isCcVerified.toString()}</td>
+        <td className='right aligned'>{this.state.transactionSummary}</td>
+        <td className='right aligned'>{this.state.transactionId}</td>
         <td className='right aligned'>{this.state.rtvVerified.toString()}</td>
         <td className='right aligned'>{this.state.validationStatus}</td>
         <td className='right aligned'>{this.state.paymentExceptionCode}</td>
@@ -124,36 +139,27 @@ class CardValidate extends React.Component {
                   <div className='ui icon input'>
 		    <form onSubmit={this.handleSubmit}>
                       <div className="field">
-			<label>
-                        Card Number:  
-                        <input type="text" value={this.state.cardNumber} onChange={this.handleChange} />
-                        </label>
+                        <input type="text" placeholder="Card Number..." value={this.state.cardNumber} onChange={this.handleChange} />
 		      </div>
+                      <br />
                       <div className="field">
-                        <label>
-                        Card Cvv:  
-                        <input type="text" value={this.state.cardCvv} onChange={this.handleCvvChange} />
-                        </label>
+                        <input type="text" placeholder="Card CVV..."  value={this.state.cardCvv} onChange={this.handleCvvChange} />
                       </div>
+                      <div>
                       <input type="submit" value="Submit" />
+                      </div>
                     </form>
-                    <i className='search icon' />
                   </div>
-                  <i
-                    className='remove icon'
-                    onClick={this.handleRtvCancel}
-                    style={removeIconStyle}
-                  />
                 </div>
               </th>
             </tr>
             <tr>
-              <th className='eight wide'>Description</th>
-              <th>isCCVerified</th>
-              <th>rtvResponse</th>
-              <th>validationStatus</th>
-              <th>code</th>
-			  <th>description</th>
+              <th>Transaction Summary</th>
+              <th>Transaction Id</th>
+              <th>Rtv Verified?</th>
+              <th>Validation Status</th>
+              <th>Error Code</th>
+	      <th>Error Description</th>
             </tr>
           </thead>
           <tbody>
